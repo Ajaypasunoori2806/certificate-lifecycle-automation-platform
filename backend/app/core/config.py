@@ -1,3 +1,5 @@
+from urllib.parse import quote_plus
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,7 +15,11 @@ class Settings(BaseSettings):
     PORT: int
 
     # Database
-    DATABASE_URL: str
+    DB_HOST: str
+    DB_PORT: int
+    DB_NAME: str
+    DB_USER: str
+    DB_PASSWORD: str
 
     # Security
     SECRET_KEY: str
@@ -25,8 +31,15 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        case_sensitive=True
+        case_sensitive=True,
     )
+
+    @property
+    def DATABASE_URL(self) -> str:
+        return (
+            f"postgresql://{self.DB_USER}:{quote_plus(self.DB_PASSWORD)}"
+            f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        )
 
 
 settings = Settings()
