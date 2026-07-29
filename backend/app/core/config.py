@@ -29,6 +29,17 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str
 
+    # Email Configuration
+    EMAIL_PROVIDER: str = "smtp"
+
+    SMTP_HOST: str
+    SMTP_PORT: int = 587
+
+    SMTP_USERNAME: str
+    SMTP_PASSWORD: str
+
+    SMTP_FROM: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,

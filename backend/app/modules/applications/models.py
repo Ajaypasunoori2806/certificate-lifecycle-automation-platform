@@ -1,6 +1,7 @@
-from sqlalchemy import Boolean, DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 
@@ -59,4 +60,10 @@ class Application(Base):
         DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
+    )
+
+    certificates: Mapped[list["Certificate"]] = relationship(
+        "Certificate",
+        back_populates="application",
+        cascade="all, delete-orphan",
     )
