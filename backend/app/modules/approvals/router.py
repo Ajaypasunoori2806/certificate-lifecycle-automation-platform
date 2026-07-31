@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+from app.auth.permissions import require_admin
 from app.database.session import get_db
 from app.modules.approvals.schemas import (
     ApprovalCreate,
@@ -22,6 +25,7 @@ router = APIRouter(
 )
 def create_approval(
     approval: ApprovalCreate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return ApprovalService.create_approval(
@@ -35,6 +39,7 @@ def create_approval(
     response_model=list[ApprovalResponse],
 )
 def get_all_approvals(
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return ApprovalService.get_all_approvals(db)
@@ -46,6 +51,7 @@ def get_all_approvals(
 )
 def get_approval(
     approval_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return ApprovalService.get_approval(
@@ -60,6 +66,7 @@ def get_approval(
 )
 def get_certificate_approvals(
     certificate_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return ApprovalService.get_certificate_approvals(
@@ -75,6 +82,7 @@ def get_certificate_approvals(
 def update_approval(
     approval_id: int,
     approval: ApprovalUpdate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return ApprovalService.update_approval(
@@ -89,6 +97,7 @@ def update_approval(
 )
 def delete_approval(
     approval_id: int,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return ApprovalService.delete_approval(

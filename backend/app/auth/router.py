@@ -2,7 +2,10 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordRequestForm
 
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
 from app.auth.schemas import (
     Token,
     UserCreate,
@@ -45,13 +48,14 @@ def register(
     response_model=Token,
 )
 def login(
-    credentials: UserLogin,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
     try:
         return AuthService.login(
             db,
-            credentials,
+            form_data.username,
+            form_data.password,
         )
 
     except ValueError as e:
@@ -59,3 +63,13 @@ def login(
             status_code=401,
             detail=str(e),
         )
+
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+)
+def get_logged_in_user(
+    current_user: User = Depends(get_current_user),
+):
+    return current_user

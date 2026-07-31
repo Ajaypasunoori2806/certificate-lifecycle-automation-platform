@@ -16,10 +16,14 @@ SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    print("=" * 60)
+    print("PASSWORD RECEIVED:", repr(password))
+    print("TYPE:", type(password))
+    print("LENGTH:", len(password))
+    print("=" * 60)
 
+    return pwd_context.hash(password)
 
 def verify_password(
     plain_password: str,

@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+from app.auth.permissions import require_admin
 from app.database.session import get_db
 from app.modules.applications.schemas import (
     ApplicationCreate,
@@ -22,6 +25,7 @@ router = APIRouter(
 )
 def create_application(
     application: ApplicationCreate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return ApplicationService.create_application(db, application)
@@ -32,6 +36,7 @@ def create_application(
     response_model=list[ApplicationResponse],
 )
 def get_all_applications(
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return ApplicationService.get_all_applications(db)
@@ -43,6 +48,7 @@ def get_all_applications(
 )
 def get_application(
     application_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return ApplicationService.get_application(
@@ -58,6 +64,7 @@ def get_application(
 def update_application(
     application_id: int,
     application: ApplicationUpdate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return ApplicationService.update_application(
@@ -72,6 +79,7 @@ def update_application(
 )
 def delete_application(
     application_id: int,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return ApplicationService.delete_application(

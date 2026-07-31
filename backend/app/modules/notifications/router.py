@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+from app.auth.permissions import require_admin
 from app.database.session import get_db
 from app.modules.notifications.schemas import (
     NotificationCreate,
@@ -22,6 +25,7 @@ router = APIRouter(
 )
 def create_notification(
     notification: NotificationCreate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return NotificationService.create_notification(
@@ -35,6 +39,7 @@ def create_notification(
     response_model=list[NotificationResponse],
 )
 def get_all_notifications(
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return NotificationService.get_all_notifications(db)
@@ -46,6 +51,7 @@ def get_all_notifications(
 )
 def get_notification(
     notification_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return NotificationService.get_notification(
@@ -60,6 +66,7 @@ def get_notification(
 )
 def get_certificate_notifications(
     certificate_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return NotificationService.get_certificate_notifications(
@@ -75,6 +82,7 @@ def get_certificate_notifications(
 def update_notification(
     notification_id: int,
     notification: NotificationUpdate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return NotificationService.update_notification(
@@ -89,6 +97,7 @@ def update_notification(
 )
 def delete_notification(
     notification_id: int,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return NotificationService.delete_notification(

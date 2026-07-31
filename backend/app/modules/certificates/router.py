@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+from app.auth.permissions import require_admin
 from app.database.session import get_db
 from app.modules.certificates.schemas import (
     CertificateCreate,
@@ -22,6 +25,7 @@ router = APIRouter(
 )
 def create_certificate(
     certificate: CertificateCreate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return CertificateService.create_certificate(
@@ -40,6 +44,7 @@ def get_all_certificates(
     environment: str | None = None,
     issuer: str | None = None,
     certificate_type: str | None = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     if any([
@@ -67,6 +72,7 @@ def get_all_certificates(
 )
 def get_certificate(
     certificate_id: int,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return CertificateService.get_certificate(
@@ -82,6 +88,7 @@ def get_certificate(
 def update_certificate(
     certificate_id: int,
     certificate: CertificateUpdate,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return CertificateService.update_certificate(
@@ -96,6 +103,7 @@ def update_certificate(
 )
 def delete_certificate(
     certificate_id: int,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     return CertificateService.delete_certificate(

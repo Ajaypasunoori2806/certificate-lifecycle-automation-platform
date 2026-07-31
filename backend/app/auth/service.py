@@ -4,7 +4,6 @@ from app.auth.repository import UserRepository
 from app.auth.schemas import (
     Token,
     UserCreate,
-    UserLogin,
 )
 from app.auth.security import (
     create_access_token,
@@ -20,7 +19,6 @@ class AuthService:
         db: Session,
         user: UserCreate,
     ):
-
         existing_user = UserRepository.get_by_email(
             db,
             user.email,
@@ -44,12 +42,12 @@ class AuthService:
     @staticmethod
     def login(
         db: Session,
-        credentials: UserLogin,
-    ) -> Token:
-
+        email: str,
+        password: str,
+    ):
         user = UserRepository.get_by_email(
             db,
-            credentials.email,
+            email,
         )
 
         if not user:
@@ -58,7 +56,7 @@ class AuthService:
             )
 
         if not verify_password(
-            credentials.password,
+            password,
             user.password,
         ):
             raise ValueError(
